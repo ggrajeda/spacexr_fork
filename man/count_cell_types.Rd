@@ -10,7 +10,8 @@ count_cell_types(
   cell_types,
   cell_type_threshold = 125,
   doublet_mode = T,
-  weight_threshold = NULL
+  weight_threshold = NULL,
+  cell_type_filter = NULL
 )
 }
 \arguments{

@@ -13,7 +13,14 @@ plot_puck_wrapper(
   min_val = NULL,
   max_val = NULL,
   title = NULL,
-  my_cond = NULL
+  my_cond = NULL,
+  counter_barcodes = NULL,
+  my_pal = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  size = 0.15,
+  alpha = 1,
+  small_point = F
 )
 }
 \arguments{
@@ -30,6 +37,12 @@ plot_puck_wrapper(
 \item{min_val}{numeric, minimum value for the range of plot as a numeric list}
 
 \item{max_val}{numeric, maximum value for the range of plot as a numeric list}
+
+\item{xlim}{(optional) minimum and maximum value for x coordinate as a numeric list}
+
+\item{ylim}{(optional) minimum and maximum value for y coordinate as a numeric list}
+
+\item{size}{numeric size of points}
 
 \item{cell_type_info}{cell type information and profiles (see \code{\link{get_cell_type_info}})}
 }

@@ -4,7 +4,24 @@
 \alias{plot_weights_unthreshold}
 \title{Spatially plot all weights for each cell type}
 \usage{
-plot_weights_unthreshold(cell_type_names, puck, resultsdir, weights)
+plot_weights_unthreshold(
+  cell_type_names,
+  puck,
+  resultsdir,
+  weights,
+  ylimit = c(0, 1),
+  counter_barcodes = NULL,
+  my_pal = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  size = 0.15,
+  alpha = 1,
+  small_point = F,
+  minUMI = 100,
+  maxUMI = 2e+05,
+  min_val = 0,
+  max_val = 1
+)
 }
 \arguments{
 \item{cell_type_names}{list of cell type names}
@@ -14,6 +31,20 @@ plot_weights_unthreshold(cell_type_names, puck, resultsdir, weights)
 \item{resultsdir}{output directory}
 
 \item{weights}{a dataframe of RCTD output weights (stored in the RCTD object)}
+
+\item{xlim}{(optional) minimum and maximum value for x coordinate as a numeric list}
+
+\item{ylim}{(optional) minimum and maximum value for y coordinate as a numeric list}
+
+\item{size}{numeric size of points}
+
+\item{minUMI}{numeric, minimum value for total UMIs to filter pixels}
+
+\item{maxUMI}{numeric, maximum value for total UMIs to filter pixels}
+
+\item{min_val}{numeric, minimum value for the range of plot as a numeric list}
+
+\item{max_val}{numeric, maximum value for the range of plot as a numeric list}
 }
 \description{
 Plots all weights for each cell type as in full_mode. Saves as 'cell_type_weights_unthreshold.pdf'

@@ -9,7 +9,16 @@ plot_weights_doublet(
   puck,
   resultsdir,
   weights_doublet,
-  results_df
+  results_df,
+  ylimit = c(0, 1),
+  title = NULL,
+  counter_barcodes = NULL,
+  my_pal = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  size = 0.15,
+  alpha = 1,
+  small_point = F
 )
 }
 \arguments{
@@ -22,6 +31,14 @@ plot_weights_doublet(
 \item{weights_doublet}{a dataframe of RCTD output weights for doublets (stored in the RCTD object)}
 
 \item{results_df}{dataframe of RCTD results (stored in the RCTD object)}
+
+\item{ylimit}{minimum and maximum values for the range of plot as a numeric list}
+
+\item{xlim}{(optional) minimum and maximum value for x coordinate as a numeric list}
+
+\item{ylim}{(optional) minimum and maximum value for y coordinate as a numeric list}
+
+\item{size}{numeric size of points}
 }
 \description{
 Plots the weights for each cell type as in doublet_mode. Saves as 'cell_type_weights_doublet.pdf'

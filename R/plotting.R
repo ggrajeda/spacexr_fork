@@ -121,7 +121,7 @@ plot_doublets_type <- function(puck, doublets_base, resultsdir, cell_type_names)
 #'
 #' @return Returns a \link{ggplot} object
 #' @export
-plot_puck_continuous <- function(puck, barcodes, plot_val, ylimit = c(0,1),title = NULL, counter_barcodes = NULL, label = F, my_pal = NULL, xlim = NULL, ylim = NULL, size=0.15, alpha = 1, small_point = F) {
+plot_puck_continuous <- function(puck, barcodes, plot_val, ylimit = c(0,1),title = NULL, counter_barcodes = NULL, my_pal = NULL, xlim = NULL, ylim = NULL, size=0.15, alpha = 1, small_point = F) {
   if(is.null(my_pal))
     my_pal = pals::kovesi.rainbow(20)
   my_table = puck@coords[barcodes,]
@@ -137,8 +137,8 @@ plot_puck_continuous <- function(puck, barcodes, plot_val, ylimit = c(0,1),title
   else
     plot <- plot + ggplot2::geom_point(ggplot2::aes(size = size, shape=19,color=value),alpha = alpha)
   plot <- plot + sc + ggplot2::scale_shape_identity() + ggplot2::theme_classic() + ggplot2::scale_size_identity()
-  if(label)
-    plot <- plot + ggplot2::aes(label = which(rownames(puck@coords) %in% inter_barcodes[my_class==i])) + ggplot2::geom_text()
+  #if(label)
+  #  plot <- plot + ggplot2::aes(label = which(rownames(puck@coords) %in% inter_barcodes[my_class==i])) + ggplot2::geom_text()
   if(!is.null(counter_barcodes)) {
     my_table = puck@coords[counter_barcodes,]
     plot <- plot + ggplot2::geom_point(data=my_table,ggplot2::aes(x=x, y=y,size=0.15),alpha = 0.1)
@@ -164,11 +164,17 @@ plot_puck_continuous <- function(puck, barcodes, plot_val, ylimit = c(0,1),title
 #' @param max_val numeric, maximum value for the range of plot as a numeric list
 #' @param minUMI numeric, minimum value for total UMIs to filter pixels
 #' @param maxUMI numeric, maximum value for total UMIs to filter pixels
+#' @param ylim (optional) minimum and maximum value for y coordinate as a numeric list
+#' @param xlim (optional) minimum and maximum value for x coordinate as a numeric list
+#' @param size numeric size of points
 #' @param cell_type_info cell type information and profiles (see \code{\link{get_cell_type_info}})
 #'
 #' @return Returns a \link{ggplot} object
 #' @export
-plot_puck_wrapper <- function(puck, plot_val, cell_type = NULL, minUMI = 0, maxUMI = 200000, min_val = NULL, max_val = NULL, title = NULL, my_cond = NULL) {
+plot_puck_wrapper <- function(puck, plot_val, cell_type = NULL, minUMI = 0, maxUMI = 200000,
+                              min_val = NULL, max_val = NULL, title = NULL, my_cond = NULL,
+                              counter_barcodes = NULL, my_pal = NULL, xlim = NULL,
+                              ylim = NULL, size=0.15, alpha = 1, small_point = F) {
   UMI_filter = (puck@nUMI > minUMI) & (puck@nUMI < maxUMI)
   ylimit = NULL
   if(!is.null(my_cond))
@@ -185,7 +191,10 @@ plot_puck_wrapper <- function(puck, plot_val, cell_type = NULL, minUMI = 0, maxU
     if(!is.null(min_val))
       ylimit = c(min_val, max_val)
   }
-  plot_puck_continuous(puck, names(which(my_cond)), plot_val, title = title, ylimit = ylimit)
+  plot_puck_continuous(puck, names(which(my_cond)), plot_val, title = title,
+                       ylimit = ylimit, counter_barcodes = counter_barcodes,
+                       my_pal = my_pal, xlim =xlim, ylim = ylim,
+                       size=size, alpha = alpha, small_point = small_point)
 }
 
 
@@ -197,15 +206,30 @@ plot_puck_wrapper <- function(puck, plot_val, cell_type = NULL, minUMI = 0, maxU
 #' @param weights a dataframe of RCTD output weights (stored in the RCTD object)
 #' @param resultsdir output directory
 #' @param cell_type_names list of cell type names
+#' @param min_val numeric, minimum value for the range of plot as a numeric list
+#' @param max_val numeric, maximum value for the range of plot as a numeric list
+#' @param minUMI numeric, minimum value for total UMIs to filter pixels
+#' @param maxUMI numeric, maximum value for total UMIs to filter pixels
+#' @param ylim (optional) minimum and maximum value for y coordinate as a numeric list
+#' @param xlim (optional) minimum and maximum value for x coordinate as a numeric list
+#' @param size numeric size of points
 #' @export
-plot_weights <- function(cell_type_names, puck, resultsdir, weights) {
+plot_weights <- function(cell_type_names, puck, resultsdir, weights, minUMI = 100, maxUMI = 200000,
+                         min_val = 0, max_val = 1,
+                         counter_barcodes = NULL, my_pal = NULL, xlim = NULL,
+                         ylim = NULL, size=0.15, alpha = 1, small_point = F) {
   plots <- vector(mode = "list", length = length(cell_type_names))
   for (i in 1:length(cell_type_names)) {
     cell_type = cell_type_names[i]
     my_cond = weights[,cell_type] > UMI_cutoff(puck@nUMI) # pmax(0.25, 0.7 - puck@nUMI / 1000)
     plot_var <- weights[,cell_type]; names(plot_var) = rownames(weights)
     if(sum(my_cond) > 0)
-      plots[[i]] <- plot_puck_wrapper(puck, plot_var, NULL, minUMI = 100,maxUMI = 200000,min_val = 0, max_val = 1, title = cell_type, my_cond = my_cond)
+      plots[[i]] <- plot_puck_wrapper(puck, plot_var, NULL, minUMI = minUMI,maxUMI = maxUMI,
+                                      min_val = min_val, max_val = max_val,
+                                      title = cell_type, my_cond = my_cond,
+                                      counter_barcodes = counter_barcodes,
+                                      my_pal = my_pal, xlim =xlim, ylim = ylim,
+                                      size=size, alpha = alpha, small_point = small_point)
   }
   pdf(file.path(resultsdir,"cell_type_weights.pdf"))
   invisible(lapply(plots, print))
@@ -220,14 +244,30 @@ plot_weights <- function(cell_type_names, puck, resultsdir, weights) {
 #' @param weights a dataframe of RCTD output weights (stored in the RCTD object)
 #' @param resultsdir output directory
 #' @param cell_type_names list of cell type names
+#' @param min_val numeric, minimum value for the range of plot as a numeric list
+#' @param max_val numeric, maximum value for the range of plot as a numeric list
+#' @param minUMI numeric, minimum value for total UMIs to filter pixels
+#' @param maxUMI numeric, maximum value for total UMIs to filter pixels
+#' @param ylim (optional) minimum and maximum value for y coordinate as a numeric list
+#' @param xlim (optional) minimum and maximum value for x coordinate as a numeric list
+#' @param size numeric size of points
 #' @export
-plot_weights_unthreshold <- function(cell_type_names, puck, resultsdir, weights) {
+plot_weights_unthreshold <- function(cell_type_names, puck, resultsdir, weights, ylimit = c(0,1),
+                                     counter_barcodes = NULL,
+                                     my_pal = NULL, xlim = NULL, ylim = NULL,
+                                     size=0.15, alpha = 1, small_point = F,
+                                     minUMI = 100,maxUMI = 200000,
+                                     min_val = 0, max_val = 1) {
   plots <- vector(mode = "list", length = length(cell_type_names))
   for (i in 1:length(cell_type_names)) {
     cell_type = cell_type_names[i]
     plot_var <- weights[,cell_type]; names(plot_var) = rownames(weights)
     if(sum(weights[,cell_type]) > 0)
-      plots[[i]] <- plot_puck_wrapper(puck, plot_var, NULL, minUMI = 100,maxUMI = 200000,min_val = 0, max_val = 1, title = cell_type)
+      plots[[i]] <- plot_puck_wrapper(puck, plot_var, NULL, minUMI = minUMI,maxUMI = maxUMI,
+                                      min_val = min_val, max_val = max_val, title = cell_type,
+                                      counter_barcodes = counter_barcodes,
+                                      my_pal = my_pal, xlim =xlim, ylim = ylim,
+                                      size=size, alpha = alpha, small_point = small_point)
   }
   pdf(file.path(resultsdir,"cell_type_weights_unthreshold.pdf"))
   invisible(lapply(plots, print))
@@ -290,8 +330,16 @@ plot_occur_unthreshold <- function(cell_type_info, resultsdir, weights) {
 #' @param resultsdir output directory
 #' @param cell_type_names list of cell type names
 #' @param results_df dataframe of RCTD results (stored in the RCTD object)
+#' @param ylimit minimum and maximum values for the range of plot as a numeric list
+#' @param ylim (optional) minimum and maximum value for y coordinate as a numeric list
+#' @param xlim (optional) minimum and maximum value for x coordinate as a numeric list
+#' @param size numeric size of points
 #' @export
-plot_weights_doublet <- function(cell_type_names, puck, resultsdir, weights_doublet, results_df) {
+plot_weights_doublet <- function(cell_type_names, puck, resultsdir,
+                                 weights_doublet, results_df, ylimit = c(0,1),
+                                 title = NULL, counter_barcodes = NULL,
+                                 my_pal = NULL, xlim = NULL, ylim = NULL,
+                                 size=0.15, alpha = 1, small_point = F) {
   plots <- vector(mode = "list", length = length(cell_type_names))
   for (i in 1:length(cell_type_names)) {
     cell_type = cell_type_names[i]
@@ -299,7 +347,10 @@ plot_weights_doublet <- function(cell_type_names, puck, resultsdir, weights_doub
     all_weights <- rbind(all_weights, weights_doublet[!(results_df$spot_class == "reject") & results_df$first_type == cell_type,1,drop=FALSE])
     all_weights_vec <- as.vector(all_weights); names(all_weights_vec) <- rownames(all_weights)
     if(length(all_weights) > 0)
-      plots[[i]] <- plot_puck_continuous(puck, rownames(all_weights), all_weights_vec, title = cell_type, ylimit = c(0,1))
+      plots[[i]] <- plot_puck_continuous(puck, rownames(all_weights), all_weights_vec, title = cell_type, ylimit = c(0,1),
+                                         counter_barcodes = counter_barcodes,
+                                         my_pal = my_pal, xlim =xlim, ylim = ylim,
+                                         size=size, alpha = alpha, small_point = small_point)
     else
       plots[[i]] <- NULL
   }

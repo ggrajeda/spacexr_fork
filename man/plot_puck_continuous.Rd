@@ -11,7 +11,6 @@ plot_puck_continuous(
   ylimit = c(0, 1),
   title = NULL,
   counter_barcodes = NULL,
-  label = F,
   my_pal = NULL,
   xlim = NULL,
   ylim = NULL,
